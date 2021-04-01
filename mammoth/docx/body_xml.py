@@ -428,18 +428,26 @@ def _create_reader(numbering, content_types, relationships, styles, docx_file, f
             .find_children("pic:pic") \
             .find_children("pic:blipFill") \
             .find_children("a:blip")
-        return _read_blips(blips, alt_text)
 
-    def _read_blips(blips, alt_text):
-        return _ReadResult.concat(lists.map(lambda blip: _read_blip(blip, alt_text), blips))
+        extent_attributes = element.find_child("wp:extent").attributes
+        raw_width = int(extent_attributes.get('cx'))
+        raw_height = int(extent_attributes.get('cy'))
+        return _read_blips(blips, alt_text, raw_width, raw_height)
 
-    def _read_blip(element, alt_text):
-        return _read_image(lambda: _find_blip_image(element), alt_text)
+    def _read_blips(blips, alt_text, raw_width, raw_height):
+        return _ReadResult.concat(lists.map(lambda blip: _read_blip(blip, alt_text, raw_width, raw_height), blips))
 
-    def _read_image(find_image, alt_text):
+    def _read_blip(element, alt_text, raw_width, raw_height):
+        return _read_image(lambda: _find_blip_image(element), alt_text, raw_width, raw_height)
+
+    def _read_image(find_image, alt_text, raw_width, raw_height):
         image_path, open_image = find_image()
         content_type = content_types.find_content_type(image_path)
-        image = documents.image(alt_text=alt_text, content_type=content_type, open=open_image)
+        aspect_ratio = raw_width / raw_height
+        width = round(raw_width / 8091.17)
+        height = round(width / aspect_ratio)
+        image = documents.image(alt_text=alt_text, content_type=content_type, open=open_image, width=width, height=height)
+        print(image)
 
         if content_type in ["image/png", "image/gif", "image/jpeg", "image/svg+xml", "image/tiff"]:
             messages = []
