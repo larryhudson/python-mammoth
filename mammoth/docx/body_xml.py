@@ -444,9 +444,11 @@ def _create_reader(numbering, content_types, relationships, styles, docx_file, f
         image_path, open_image = find_image()
         content_type = content_types.find_content_type(image_path)
         aspect_ratio = raw_width / raw_height
-        width = round(raw_width / 8091.17)
-        height = round(width / aspect_ratio)
-        image = documents.image(alt_text=alt_text, content_type=content_type, open=open_image, width=width, height=height)
+        width = raw_width / 8091.17
+        height = width / aspect_ratio
+        rounded_width = round(width)
+        rounded_height = round(height)
+        image = documents.image(alt_text=alt_text, content_type=content_type, open=open_image, width=rounded_width, height=rounded_height)
 
         if content_type in ["image/png", "image/gif", "image/jpeg", "image/svg+xml", "image/tiff"]:
             messages = []
