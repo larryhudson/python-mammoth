@@ -445,7 +445,7 @@ def _create_reader(numbering, content_types, relationships, styles, docx_file, f
         content_type = content_types.find_content_type(image_path)
         aspect_ratio = raw_width / raw_height
         width = raw_width / 8091.17
-        height = width / aspect_ratio
+        height = raw_height / 8091.17
         rounded_width = round(width)
         rounded_height = round(height)
         image = documents.image(alt_text=alt_text, content_type=content_type, open=open_image, width=rounded_width, height=rounded_height)
